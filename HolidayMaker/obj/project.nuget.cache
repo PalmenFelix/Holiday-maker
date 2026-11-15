@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "0RiUX25GzNE=",
+  "dgSpecHash": "UbJrHYEDO0U=",
   "success": true,
-  "projectFilePath": "C:\\Övning kod\\Holiday-maker\\HolidayMaker\\HolidayMaker.csproj",
+  "projectFilePath": "C:\\Övning kod\\Holiday-maker\\holidaymaker\\HolidayMaker.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\felix\\.nuget\\packages\\bouncycastle.cryptography\\2.6.2\\bouncycastle.cryptography.2.6.2.nupkg.sha512",
     "C:\\Users\\felix\\.nuget\\packages\\google.protobuf\\3.35.0\\google.protobuf.3.35.0.nupkg.sha512",
