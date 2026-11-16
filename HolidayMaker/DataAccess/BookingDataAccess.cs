@@ -38,56 +38,72 @@ public class BookingDataAccess
         return bookings;
     }
 
-    public List<Rooms> SearchAvailableRooms(string location, DateTime checkIn, DateTime checkOut, int people)
+    public List<Rooms> SearchAvailableRooms(
+    string location, DateTime checkIn, DateTime checkOut,
+    int people, bool pool, bool restaurant,
+    int maxBeach, int maxCenter, string sort)
+{
+    List<Rooms> rooms = new List<Rooms>();
+    DataBaseConnection db = new DataBaseConnection();
+
+    MySqlConnection connection = db.GetConnection();
+    connection.Open();
+
+    string query = @"
+        SELECT Rooms.*
+        FROM Rooms
+        JOIN Hotel ON Rooms.HotelID = Hotel.ID
+        WHERE Hotel.Location = @Location
+        AND Rooms.MaxPersons >= @People
+        AND (@Pool = 0 OR Hotel.Pool = 1)
+        AND (@Restaurant = 0 OR Hotel.Restaurant = 1)
+        AND (@MaxBeach = -1 OR Hotel.DistanceBeach <= @MaxBeach)
+        AND (@MaxCenter = -1 OR Hotel.DistanceCenter <= @MaxCenter)
+        AND NOT EXISTS
+        (
+            SELECT 1
+            FROM Booking
+            WHERE Booking.RoomID = Rooms.ID
+            AND Booking.CheckIn < @CheckOut
+            AND Booking.CheckOut > @CheckIn
+        )";
+
+    if (sort == "price")
+        query += " ORDER BY Rooms.Price ASC";
+    else if (sort == "rating")
+        query += " ORDER BY Hotel.Rating DESC";
+
+    MySqlCommand command = new MySqlCommand(query, connection);
+
+    command.Parameters.AddWithValue("@Location", location);
+    command.Parameters.AddWithValue("@People", people);
+    command.Parameters.AddWithValue("@Pool", pool);
+    command.Parameters.AddWithValue("@Restaurant", restaurant);
+    command.Parameters.AddWithValue("@MaxBeach", maxBeach);
+    command.Parameters.AddWithValue("@MaxCenter", maxCenter);
+    command.Parameters.AddWithValue("@CheckIn", checkIn);
+    command.Parameters.AddWithValue("@CheckOut", checkOut);
+
+    MySqlDataReader reader = command.ExecuteReader();
+
+    while (reader.Read())
     {
-        List<Rooms> rooms = new List<Rooms>();
-        DataBaseConnection db = new DataBaseConnection();
+        Rooms room = new Rooms();
 
-        MySqlConnection connection = db.GetConnection();
-        connection.Open();
+        room.ID = reader.GetInt32("ID");
+        room.HotelID = reader.GetInt32("HotelID");
+        room.RoomNumber = reader.GetInt32("RoomNumber");
+        room.MaxPersons = reader.GetInt32("MaxPersons");
+        room.Price = reader.GetInt32("Price");
 
-        string query = @"
-            SELECT Rooms.*
-            FROM Rooms
-            JOIN Hotel ON Rooms.HotelID = Hotel.ID
-            WHERE Hotel.Location = @Location
-            AND Rooms.MaxPersons >= @People
-            AND NOT EXISTS
-            (
-                SELECT 1
-                FROM Booking
-                WHERE Booking.RoomID = Rooms.ID
-                AND Booking.CheckIn < @CheckOut
-                AND Booking.CheckOut > @CheckIn
-            )";
-
-        MySqlCommand command = new MySqlCommand(query, connection);
-
-        command.Parameters.AddWithValue("@Location", location);
-        command.Parameters.AddWithValue("@People", people);
-        command.Parameters.AddWithValue("@CheckIn", checkIn);
-        command.Parameters.AddWithValue("@CheckOut", checkOut);
-
-        MySqlDataReader reader = command.ExecuteReader();
-
-        while (reader.Read())
-        {
-            Rooms room = new Rooms();
-
-            room.ID = reader.GetInt32("ID");
-            room.HotelID = reader.GetInt32("HotelID");
-            room.RoomNumber = reader.GetInt32("RoomNumber");
-            room.MaxPersons = reader.GetInt32("MaxPersons");
-            room.Price = reader.GetInt32("Price");
-
-            rooms.Add(room);
-        }
-
-        reader.Close();
-        connection.Close();
-
-        return rooms;
+        rooms.Add(room);
     }
+
+    reader.Close();
+    connection.Close();
+
+    return rooms;
+}
 
     public bool AddBooking(Booking booking)
     {
