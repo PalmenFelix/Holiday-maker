@@ -8,6 +8,7 @@ public class Menu
 {
     private CustomerService customerService = new CustomerService();
     private BookingService bookingService = new BookingService();
+    private HotelService hotelService = new HotelService();
     private HotelDataAccess hotelDataAccess = new HotelDataAccess();
     private RoomDataAccess roomDataAccess = new RoomDataAccess();
 
@@ -25,6 +26,7 @@ public class Menu
             Console.WriteLine("5. Ändra antal personer");
             Console.WriteLine("6. Avboka");
             Console.WriteLine("7. Visa alla kunder");
+            Console.WriteLine("8. Visa alla hotell");
             Console.WriteLine("0. Avsluta");
 
             Console.Write("Välj ett alternativ: ");
@@ -52,6 +54,9 @@ public class Menu
                     break;
                 case "7":
                     ShowAllCustomers();
+                    break;
+                case "8":
+                    ShowAllHotels();
                     break;
                 case "0":
                     running = false;
@@ -300,6 +305,31 @@ public class Menu
         foreach (Customer customer in customers)
         {
             Console.WriteLine($"ID: {customer.ID}, Namn: {customer.Name}, E-post: {customer.Email}, Telefonnummer: {customer.PhoneNumber}");
+        }
+    }
+    private void ShowAllHotels()
+    {
+        Console.WriteLine("\n-VISA ALLA HOTELL-");
+
+        List<Hotel> hotels = hotelService.GetAllHotels();
+
+        if (hotels.Count == 0)
+        {
+            Console.WriteLine("Inga hotell hittades");
+            return;
+        }
+
+        foreach (Hotel hotel in hotels)
+        {
+            Console.WriteLine($"Namn: {hotel.Name}");
+            Console.WriteLine($"Ort: {hotel.Location}");
+            Console.WriteLine($"Pool: Ja");
+            Console.WriteLine($"Restaurang: Ja");
+            Console.WriteLine($"Avstånd till strand: {hotel.DistanceBeach} meter");
+            Console.WriteLine($"Avstånd till centrum: {hotel.DistanceCenter} meter");
+            Console.WriteLine($"Betyg: {hotel.Rating}/5");
+
+            Console.WriteLine();
         }
     }
 }
