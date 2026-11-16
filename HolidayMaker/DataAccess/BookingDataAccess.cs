@@ -37,4 +37,58 @@ public class BookingDataAccess
 
         return bookings;
     }
+
+    public List<Rooms> SearchAvailableRooms(string location, DateTime checkIn, DateTime checkOut, int people)
+    {
+        List<Rooms> rooms = new List<Rooms>();
+        DataBaseConnection db = new DataBaseConnection();
+
+        MySqlConnection connection = db.GetConnection();
+        connection.Open();
+
+        string query = @"
+            SELECT Rooms.*
+            FROM Rooms
+            JOIN Hotel ON Rooms.HotelID = Hotel.ID
+            WHERE Hotel.Location = @Location
+            AND Rooms.MaxPersons >= @People
+            AND NOT EXISTS
+            (
+                SELECT 1
+                FROM Booking
+                WHERE Booking.RoomID = Rooms.ID
+                AND Booking.CheckIn < @CheckOut
+                AND Booking.CheckOut > @CheckIn
+            )";
+
+        MySqlCommand command = new MySqlCommand(query, connection);
+
+        command.Parameters.AddWithValue("@Location", location);
+        command.Parameters.AddWithValue("@People", people);
+        command.Parameters.AddWithValue("@CheckIn", checkIn);
+        command.Parameters.AddWithValue("@CheckOut", checkOut);
+
+        MySqlDataReader reader = command.ExecuteReader();
+
+        while (reader.Read())
+        {
+            Rooms room = new Rooms();
+
+            room.ID = reader.GetInt32("ID");
+            room.HotelID = reader.GetInt32("HotelID");
+            room.RoomNumber = reader.GetInt32("RoomNumber");
+            room.MaxPersons = reader.GetInt32("MaxPersons");
+            room.Price = reader.GetInt32("Price");
+
+            rooms.Add(room);
+        }
+
+        reader.Close();
+        connection.Close();
+
+        return rooms;
+    }
 }
+
+
+
