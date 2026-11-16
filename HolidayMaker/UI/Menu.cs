@@ -24,6 +24,7 @@ public class Menu
             Console.WriteLine("4. Visa kundens bokningar");
             Console.WriteLine("5. Ändra antal personer");
             Console.WriteLine("6. Avboka");
+            Console.WriteLine("7. Visa alla kunder");
             Console.WriteLine("0. Avsluta");
 
             Console.Write("Välj ett alternativ: ");
@@ -48,6 +49,9 @@ public class Menu
                     break;
                 case "6":
                     CancelBooking();
+                    break;
+                case "7":
+                    ShowAllCustomers();
                     break;
                 case "0":
                     running = false;
@@ -280,5 +284,22 @@ public class Menu
         bookingService.DeleteBooking(bookingID);
 
         Console.WriteLine("Bokningen har avbokats");
+    }
+    private void ShowAllCustomers()
+    {
+        Console.WriteLine("\n-VISA ALLA KUNDER-");
+
+        List<Customer> customers = customerService.GetAllCustomers();
+
+        if (customers.Count == 0)
+        {
+            Console.WriteLine("Inga kunder hittades");
+            return;
+        }
+
+        foreach (Customer customer in customers)
+        {
+            Console.WriteLine($"ID: {customer.ID}, Namn: {customer.Name}, E-post: {customer.Email}, Telefonnummer: {customer.PhoneNumber}");
+        }
     }
 }
