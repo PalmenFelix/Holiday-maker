@@ -35,4 +35,26 @@ public class CustomerDataAccess
 
         return customers;
     }
+
+    public void AddCustomer(Customer customer)
+    {
+        DataBaseConnection db = new DataBaseConnection();
+
+        MySqlConnection connection = db.GetConnection();
+        connection.Open();
+
+        string query = @"
+            INSERT INTO Customer (Name, Email, PhoneNumber)
+            VALUES (@Name, @Email, @PhoneNumber)";
+
+        MySqlCommand command = new MySqlCommand(query, connection);
+
+        command.Parameters.AddWithValue("@Name", customer.Name);
+        command.Parameters.AddWithValue("@Email", customer.Email);
+        command.Parameters.AddWithValue("@PhoneNumber", customer.PhoneNumber);
+
+        command.ExecuteNonQuery();
+
+        connection.Close();
+    }
 }

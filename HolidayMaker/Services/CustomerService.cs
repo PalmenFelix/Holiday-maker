@@ -11,4 +11,9 @@ public class CustomerService
     {
         return customerDataAccess.GetAllCustomers();
     }
+
+    public void AddCustomer(Customer customer)
+    {
+        customerDataAccess.AddCustomer(customer);
+    }
 }
