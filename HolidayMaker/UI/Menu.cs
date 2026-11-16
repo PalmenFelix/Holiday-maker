@@ -1,4 +1,3 @@
-
 namespace HolidayMaker;
 using HolidayMaker.Services;
 using HolidayMaker.Tables;
@@ -141,16 +140,44 @@ public class Menu
             return;
         }
 
+        Console.Write("Måste hotellet ha pool? (j/n): ");
+        bool pool = Console.ReadLine()?.ToLower() == "j";
+
+        Console.Write("Måste hotellet ha restaurang? (j/n): ");
+        bool restaurant = Console.ReadLine()?.ToLower() == "j";
+
+        int maxBeach = ReadInt("Maximalt avstånd till strand (meter): ");
+
+        int maxCenter = ReadInt("Maximalt avstånd till centrum (meter): ");
+        
+        Console.WriteLine("Sortera efter:");
+        Console.WriteLine("1. Pris (lägst först)");
+        Console.WriteLine("2. Betyg (högst först)");
+        Console.Write("Välj sortering: ");
+
+        string sortChoice = Console.ReadLine() ?? "";
+
+        string sort = "";
+
+        if (sortChoice == "1")
+        {
+            sort = "price";
+        }
+        else if (sortChoice == "2")
+        {
+            sort = "rating";
+        }
+
         List<Rooms> rooms = bookingService.SearchAvailableRooms(
             location, checkIn, checkOut, people,
-            false, false, -1, -1, ""
+            pool, restaurant, maxBeach, maxCenter, sort
         );
 
         List<Hotel> hotels = hotelDataAccess.GetAllHotels();
 
         if (rooms.Count == 0)
         {
-            Console.WriteLine("Inga lediga rum hittades");
+            Console.WriteLine("Inga rum hittades");
             return;
         }
 
