@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Övning kod\\Holiday-maker\\holidaymaker\\HolidayMaker.csproj": {}
+    "C:\\Övning kod\\Holiday-maker\\Holidaymaker\\HolidayMaker.csproj": {}
   },
   "projects": {
-    "C:\\Övning kod\\Holiday-maker\\holidaymaker\\HolidayMaker.csproj": {
+    "C:\\Övning kod\\Holiday-maker\\Holidaymaker\\HolidayMaker.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Övning kod\\Holiday-maker\\holidaymaker\\HolidayMaker.csproj",
+        "projectUniqueName": "C:\\Övning kod\\Holiday-maker\\Holidaymaker\\HolidayMaker.csproj",
         "projectName": "HolidayMaker",
-        "projectPath": "C:\\Övning kod\\Holiday-maker\\holidaymaker\\HolidayMaker.csproj",
+        "projectPath": "C:\\Övning kod\\Holiday-maker\\Holidaymaker\\HolidayMaker.csproj",
         "packagesPath": "C:\\Users\\felix\\.nuget\\packages\\",
-        "outputPath": "C:\\Övning kod\\Holiday-maker\\holidaymaker\\obj\\",
+        "outputPath": "C:\\Övning kod\\Holiday-maker\\Holidaymaker\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\felix\\AppData\\Roaming\\NuGet\\NuGet.Config"

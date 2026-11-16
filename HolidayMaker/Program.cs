@@ -1,11 +1,11 @@
 ﻿
 using HolidayMaker.Data;
 
-DataBaseConnection database = new DataBaseConnection();
+DataBaseConnection db = new DataBaseConnection();
 
 try
 {
-    var connection = database.GetConnection();
+    var connection = db.GetConnection();
     connection.Open();
 
     Console.WriteLine("Ansluten till databasen");
