@@ -88,7 +88,140 @@ public class BookingDataAccess
 
         return rooms;
     }
+
+    public bool AddBooking(Booking booking)
+    {
+        if (booking.CheckOut <= booking.CheckIn || booking.People <= 0)
+            return false;
+
+        DataBaseConnection db = new DataBaseConnection();
+
+        using (MySqlConnection connection = db.GetConnection())
+        {
+            connection.Open();
+
+            string checkQuery = @"
+                SELECT COUNT(*)
+                FROM Rooms
+                WHERE ID = @RoomID
+                AND MaxPersons >= @People
+                AND NOT EXISTS
+                (
+                    SELECT 1 FROM Booking
+                    WHERE RoomID = @RoomID
+                    AND CheckIn < @CheckOut
+                    AND CheckOut > @CheckIn
+                )";
+
+            MySqlCommand checkCommand = new MySqlCommand(checkQuery, connection);
+
+            checkCommand.Parameters.AddWithValue("@RoomID", booking.RoomID);
+            checkCommand.Parameters.AddWithValue("@People", booking.People);
+            checkCommand.Parameters.AddWithValue("@CheckIn", booking.CheckIn);
+            checkCommand.Parameters.AddWithValue("@CheckOut", booking.CheckOut);
+
+            int available = Convert.ToInt32(checkCommand.ExecuteScalar());
+
+            if (available == 0)
+                return false;
+
+            string query = @"
+                INSERT INTO Booking
+                (RoomID, CustomerID, CheckIn, CheckOut, People)
+                VALUES
+                (@RoomID, @CustomerID, @CheckIn, @CheckOut, @People)";
+
+            MySqlCommand command = new MySqlCommand(query, connection);
+
+            command.Parameters.AddWithValue("@RoomID", booking.RoomID);
+            command.Parameters.AddWithValue("@CustomerID", booking.CustomerID);
+            command.Parameters.AddWithValue("@CheckIn", booking.CheckIn);
+            command.Parameters.AddWithValue("@CheckOut", booking.CheckOut);
+            command.Parameters.AddWithValue("@People", booking.People);
+
+            command.ExecuteNonQuery();
+
+            return true;
+        }
+    }
+
+    public List<Booking> GetCustomerBookings(int customerID)
+    {
+        List<Booking> bookings = new List<Booking>();
+        DataBaseConnection db = new DataBaseConnection();
+
+        using (MySqlConnection connection = db.GetConnection())
+        {
+            connection.Open();
+
+            string query = "SELECT * FROM Booking WHERE CustomerID = @CustomerID";
+
+            MySqlCommand command = new MySqlCommand(query, connection);
+            command.Parameters.AddWithValue("@CustomerID", customerID);
+
+            MySqlDataReader reader = command.ExecuteReader();
+
+            while (reader.Read())
+            {
+                Booking booking = new Booking();
+
+                booking.ID = reader.GetInt32("ID");
+                booking.RoomID = reader.GetInt32("RoomID");
+                booking.CustomerID = reader.GetInt32("CustomerID");
+                booking.CheckIn = reader.GetDateTime("CheckIn");
+                booking.CheckOut = reader.GetDateTime("CheckOut");
+                booking.People = reader.GetInt32("People");
+
+                bookings.Add(booking);
+            }
+
+            reader.Close();
+        }
+
+        return bookings;
+    }
+
+    public bool UpdateBookingPeople(int bookingID, int people)
+    {
+        if (people <= 0)
+            return false;
+
+        DataBaseConnection db = new DataBaseConnection();
+
+        using (MySqlConnection connection = db.GetConnection())
+        {
+            connection.Open();
+
+            string query = @"
+                UPDATE Booking
+                JOIN Rooms ON Booking.RoomID = Rooms.ID
+                SET Booking.People = @People
+                WHERE Booking.ID = @ID
+                AND Rooms.MaxPersons >= @People";
+
+            MySqlCommand command = new MySqlCommand(query, connection);
+
+            command.Parameters.AddWithValue("@People", people);
+            command.Parameters.AddWithValue("@ID", bookingID);
+
+            return command.ExecuteNonQuery() > 0;
+        }
+    }
+    
+    public void DeleteBooking(int bookingID)
+    {
+        DataBaseConnection db = new DataBaseConnection();
+
+        using (MySqlConnection connection = db.GetConnection())
+        {
+            connection.Open();
+
+            string query = "DELETE FROM Booking WHERE ID = @ID";
+
+            MySqlCommand command = new MySqlCommand(query, connection);
+            command.Parameters.AddWithValue("@ID", bookingID);
+
+            command.ExecuteNonQuery();
+        }
+    }
 }
-
-
-
