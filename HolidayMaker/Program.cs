@@ -1,18 +1,5 @@
-﻿
-using HolidayMaker.Data;
+﻿using HolidayMaker;
 
-DataBaseConnection db = new DataBaseConnection();
+Menu menu = new Menu();
+menu.ShowMenu();
 
-try
-{
-    var connection = db.GetConnection();
-    connection.Open();
-
-    Console.WriteLine("Ansluten till databasen");
-
-    connection.Close();
-}
-catch (Exception exception)
-{
-    Console.WriteLine("Något gick fel" + exception.Message);
-}
